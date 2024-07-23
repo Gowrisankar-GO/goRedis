@@ -1,15 +1,16 @@
 package main
 
 import (
-    "context"
-    "fmt"
+	"context"
+	"fmt"
+	"time"
 
-    "github.com/redis/go-redis/v9"
+	"github.com/redis/go-redis/v9"
 )
 
-var ctx = context.Background()
+func RedisClient(ctx context.Context,cancel context.CancelFunc) {
 
-func RedisClient() {
+    defer cancel()
 
     rdb := redis.NewClient(&redis.Options{
         Addr:     "localhost:6379",
@@ -41,5 +42,7 @@ func RedisClient() {
 
 func main() {
 
-    RedisClient()
+    var ctx ,cancel = context.WithTimeout(context.Background(),5*time.Second)
+
+    RedisClient(ctx,cancel)
 }
