@@ -42,7 +42,7 @@ func RedisClient(ctx context.Context,cancel context.CancelFunc) {
 
 func main() {
 
-    var ctx ,cancel = context.WithTimeout(context.Background(),5*time.Second)
+    var ctx ,cancel = context.WithTimeout(context.Background(), 5*time.Second)
 
     RedisClient(ctx,cancel)
 }
