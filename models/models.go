@@ -5,26 +5,28 @@ import (
 	"go_redis/dbconfig"
 	errPkg "go_redis/errors"
 	"log"
+	"reflect"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 )
 
-type BasicDefs struct{
-	DbConn     *redis.Client
-	Ctx        context.Context
-	CtxCancel  context.CancelFunc
+type BasicDefs struct {
+	DbConn    *redis.Client
+	Ctx       context.Context
+	CtxCancel context.CancelFunc
 }
 
 type User struct {
-	Id        uint   `json:"id"`
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
-	Email     string `json:"email"`
-	Mobile    string `json:"mobile"`
-	Age       uint   `json:"age"`
-	RoleId    uint   `json:"roleId"`
+	Id          uint   `json:"id"`
+	FirstName   string `json:"firstName"`
+	LastName    string `json:"lastName"`
+	Email       string `json:"email"`
+	Mobile      string `json:"mobile"`
+	Age         uint   `json:"age"`
+	RoleId      uint   `json:"roleId"`
+	Status      uint   `json:"status"`
 }
 
 type Response struct {
@@ -34,7 +36,7 @@ type Response struct {
 }
 
 var (
-	Rdb     *redis.Client 
+	Rdb     *redis.Client
 	UserKey string
 )
 
@@ -58,19 +60,49 @@ func init() {
 
 	exists, err := Rdb.Exists(context.Background(), UserKey).Result()
 
-    if err != nil {
+	if err != nil {
 
-        log.Fatalf("Could not check if counter exists: %v", err)
-    }
+		log.Fatalf("Could not check if counter exists: %v", err)
+	}
 
-    if exists == 0 {
+	if exists == 0 {
 
-        err = Rdb.Set(context.Background(), UserKey, 0, 0).Err()
+		err = Rdb.Set(context.Background(), UserKey, 0, 0).Err()
 
-        if err != nil {
+		if err != nil {
 
-            log.Fatalf("Could not set initial counter value: %v", err)
-        }
-    }
+			log.Fatalf("Could not set initial counter value: %v", err)
+		}
+	}
+
+}
+
+// function used to return a struct typed data into a map[string]interface{} data
+func ConvertStructToMap(data interface{}) (map[string]interface{}, error) {
+
+	v := reflect.ValueOf(data)
+
+	// confirming whether the provided data is a struct type or not
+
+	if v.Kind() != reflect.Struct {
+
+		return map[string]interface{}{}, errPkg.ErrStructType
+	}
+
+	t := reflect.TypeOf(data)
+
+	mapData := make(map[string]interface{})
+
+	for i:=0;i<v.NumField();i++{
+
+		fieldValue := v.Field(i)
+
+		tagName := t.Field(i).Tag.Get("json")
+
+		mapData[tagName] = fieldValue.Interface()
+
+	}
+
+	return mapData, nil
 
 }

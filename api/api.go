@@ -14,5 +14,9 @@ func AppEndpints(engine *gin.Engine) *gin.Engine {
 
 	user.POST("/create", controller.CreateUser)
 
+	user.PUT("/update",controller.UpdateUser)
+
+	user.DELETE("/delete/:id",controller.DeleteUser)
+
 	return engine
 }
