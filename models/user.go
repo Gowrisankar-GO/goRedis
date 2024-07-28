@@ -2,7 +2,6 @@ package models
 
 import (
 	"fmt"
-	"reflect"
 )
 
 func (Defs BasicDefs) GetUserDetail(key string) (map[string]string, error) {
@@ -21,7 +20,7 @@ func (Defs BasicDefs) GetUserDetail(key string) (map[string]string, error) {
 	return user, nil
 }
 
-func (Defs BasicDefs) AutoIncrementUserId() (int64, error) {
+func (Defs BasicDefs) IncrementUserId() (int64, error) {
 
 	defer Defs.CtxCancel()
 
@@ -37,32 +36,68 @@ func (Defs BasicDefs) AutoIncrementUserId() (int64, error) {
 	return counter, nil
 }
 
-func (Defs BasicDefs) CreateUser(key string, user User) error {
+func (Defs BasicDefs) SetUser(key string, user User) error {
 
 	defer Defs.CtxCancel()
 
-    mapData := make(map[string]interface{})
+	mapData, err := ConvertStructToMap(user)
 
-	v := reflect.ValueOf(user)
+	if err != nil {
 
-	t := reflect.TypeOf(user)
+		fmt.Println("err", err)
 
-	for i:=0;i<v.NumField();i++{
-
-		field := t.Field(i)
-
-		tagName := field.Tag.Get("json")
-
-		fieldValue := v.Field(i)
-
-		mapData[tagName] = fieldValue.Interface()
+		return err
 	}
-
-	fmt.Println("mapData",mapData)
 
 	if _, err := Defs.DbConn.HSet(Defs.Ctx, key, mapData).Result(); err != nil {
 
 		fmt.Println("err", err)
+
+		return err
+	}
+
+	return nil
+}
+
+func (Defs BasicDefs) DeleteUser(key string) error {
+
+	defer Defs.CtxCancel()
+
+	if _, err := Defs.DbConn.Del(Defs.Ctx, key).Result(); err != nil {
+
+		fmt.Println("err", err)
+
+		return err
+	}
+
+	return nil
+}
+
+func (Defs BasicDefs) DecrementUserId() error {
+
+	defer Defs.CtxCancel()
+
+	if _, err := Defs.DbConn.Decr(Defs.Ctx, UserKey).Result(); err != nil {
+
+		return err
+	}
+
+	return nil
+}
+
+func (Defs BasicDefs) DeleteUserTransaction(key string)error{
+
+	defer Defs.CtxCancel()
+
+	pipeline := Defs.DbConn.TxPipeline()
+
+	pipeline.Del(Defs.Ctx,key)
+
+	pipeline.Decr(Defs.Ctx,UserKey)
+
+	if _, err := pipeline.Exec(Defs.Ctx);err!= nil{
+
+		fmt.Println("err",err)
 
 		return err
 	}
