@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"go_redis/models"
+	"go_redis/validator"
 	"io"
 	"net/http"
 	"strconv"
@@ -80,6 +81,16 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
+	if err := validator.ValidateStruct(userData);err!= nil{
+
+		resp = models.Response{Message: "json field validation failed", Status: 0, Data: gin.H{}}
+
+		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
+
+		return
+
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 
 	Defs := models.BasicDefs{DbConn: models.Rdb, Ctx: ctx, CtxCancel: cancel}
@@ -146,6 +157,16 @@ func UpdateUser(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
 
 		return
+	}
+
+	if err := validator.ValidateStruct(userData);err!= nil{
+
+		resp = models.Response{Message: "json field validation failed", Status: 0, Data: gin.H{}}
+
+		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
+
+		return
+
 	}
 
 	userId := int(userData.Id)
