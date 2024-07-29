@@ -19,14 +19,14 @@ type BasicDefs struct {
 }
 
 type User struct {
-	Id          uint   `json:"id"`
-	FirstName   string `json:"firstName"`
-	LastName    string `json:"lastName"`
-	Email       string `json:"email"`
-	Mobile      string `json:"mobile"`
-	Age         uint   `json:"age"`
-	RoleId      uint   `json:"roleId"`
-	Status      uint   `json:"status"`
+	Id          uint   `json:"id" validate:"omitempty"`
+	FirstName   string `json:"firstName" validate:"required,firstname"`
+	LastName    string `json:"lastName" validate:"omitempty,lastname"`
+	Email       string `json:"email" validate:"required,email"`
+	Mobile      string `json:"mobile" validate:"required,mobile"`
+	Age         uint   `json:"age" validate:"required,age"`
+	RoleId      uint   `json:"roleId" validate:"required,roleid"`
+	Status      uint   `json:"status" validate:"required,status"`
 }
 
 type Response struct {
@@ -36,8 +36,9 @@ type Response struct {
 }
 
 var (
-	Rdb     *redis.Client
-	UserKey string
+	Rdb             *redis.Client
+	UserKey         string
+	ValidatorKeys   map[string]string
 )
 
 func init() {
@@ -73,6 +74,19 @@ func init() {
 
 			log.Fatalf("Could not set initial counter value: %v", err)
 		}
+	}
+
+	ValidatorKeys = map[string]string{
+		"Tag"        : "validate",
+	    "Required"   : "required",
+	    "Omit"       : "omitempty",
+	    "FirstName"  : "firstname",
+	    "LastName"   : "lastname",
+	    "Email"      : "email",
+		"Mobile"     : "mobile",
+	    "Age"        : "age",
+	    "Role"       : "roleid",
+	    "Status"     : "status",
 	}
 
 }
