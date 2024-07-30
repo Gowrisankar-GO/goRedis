@@ -1,16 +1,17 @@
+// Package dbconfig used to initialize a basic Redis database connection via env file
 package dbconfig
 
 import (
 	"context"
 	"fmt"
-	errPkg "go_redis/errors"
+	errPkg "redis_user_management/errors"
 	"os"
 	"strconv"
 
 	"github.com/redis/go-redis/v9"
 )
 
-// the initial database connection
+// Function used to initialize redis database connection
 func DatabaseConnection(ctx context.Context) (*redis.Client, error) {
 
 	urlAddr := fmt.Sprintf("%s:%s", os.Getenv("DB_HOST"), os.Getenv("DB_PORT"))

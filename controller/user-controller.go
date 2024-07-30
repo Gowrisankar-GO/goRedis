@@ -1,10 +1,11 @@
+// Package controller contains handler functions used in the application
 package controller
 
 import (
 	"context"
 	"encoding/json"
-	"go_redis/models"
-	"go_redis/validator"
+	"redis_user_management/models"
+	"redis_user_management/validator"
 	"io"
 	"net/http"
 	"strconv"
@@ -14,7 +15,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// function used to fetch user details
+// Function FetchUser used to fetch user details
+// FetchUser godoc
+// @Summary Fetch a user by ID
+// @Description Retrieve a user by their unique ID
+// @Tags user
+// @Accept  json
+// @Produce  json
+// @Param   id  path  string  true  "User ID"
+// @Success 200 {object} models.Response
+// @Failure 400 {object} models.Response
+// @Failure 404 {object} models.Response
+// @Router /user/{id} [get]
 func FetchUser(c *gin.Context) {
 
 	var resp models.Response
@@ -52,7 +64,18 @@ func FetchUser(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// function used to create a new user
+// Function CreateUser used to create a new user
+// CreateUser godoc
+// @Summary Create a new user
+// @Description Create a new user with the provided details
+// @Tags user
+// @Accept  json
+// @Produce  json
+// @Param   user  body  models.User  true  "User Information"
+// @Success 200 {object} models.Response
+// @Failure 400 {object} models.Response
+// @Failure 500 {object} models.Response
+// @Router /user/create/{id} [post]
 func CreateUser(c *gin.Context) {
 
 	var resp models.Response
@@ -130,7 +153,19 @@ func CreateUser(c *gin.Context) {
 	c.JSON(200, resp)
 }
 
-// function used to update the details of the user
+// Function UpdateUser used to update the details of the user
+// UpdateUser godoc
+// @Summary Update an existing user
+// @Description Update the user details for the specified ID
+// @Tags user
+// @Accept  json
+// @Produce  json
+// @Param   user  body  models.User  true  "Updated User Information"
+// @Param   id  path  string  true  "User ID"
+// @Success 200 {object} models.Response
+// @Failure 400 {object} models.Response
+// @Failure 500 {object} models.Response
+// @Router /user/update [put]
 func UpdateUser(c *gin.Context) {
 
 	var resp models.Response
@@ -193,7 +228,18 @@ func UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, resp)
 }
 
-// function used to delete the user
+// Function DeleteUser used to delete the user
+// DeleteUser godoc
+// @Summary Delete a user by ID
+// @Description Delete the user with the specified ID
+// @Tags user
+// @Accept  json
+// @Produce  json
+// @Param   id  path  string  true  "User ID"
+// @Success 200 {object} models.Response
+// @Failure 400 {object} models.Response
+// @Failure 404 {object} models.Response
+// @Router /user/delete/{id} [delete]
 func DeleteUser(c *gin.Context) {
 
 	var resp models.Response

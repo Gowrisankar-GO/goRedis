@@ -1,13 +1,13 @@
+// Package models contains init functions and the commonly required models to interact while reading and writing in database operations
 package models
 
 import (
 	"context"
-	"go_redis/dbconfig"
-	errPkg "go_redis/errors"
 	"log"
+	"redis_user_management/dbconfig"
+	errPkg "redis_user_management/errors"
 	"reflect"
 
-	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 )
@@ -19,28 +19,29 @@ type BasicDefs struct {
 }
 
 type User struct {
-	Id          uint   `json:"id" validate:"omitempty"`
-	FirstName   string `json:"firstName" validate:"required,firstname"`
-	LastName    string `json:"lastName" validate:"omitempty,lastname"`
-	Email       string `json:"email" validate:"required,email"`
-	Mobile      string `json:"mobile" validate:"required,mobile"`
-	Age         uint   `json:"age" validate:"required,age"`
-	RoleId      uint   `json:"roleId" validate:"required,roleid"`
-	Status      uint   `json:"status" validate:"required,status"`
+	Id        uint   `json:"id" validate:"omitempty"`
+	FirstName string `json:"firstName" validate:"required,firstname"`
+	LastName  string `json:"lastName" validate:"omitempty,lastname"`
+	Email     string `json:"email" validate:"required,email"`
+	Mobile    string `json:"mobile" validate:"required,mobile"`
+	Age       uint   `json:"age" validate:"required,age"`
+	RoleId    uint   `json:"roleId" validate:"required,roleid"`
+	Status    uint   `json:"status" validate:"required,status"`
 }
 
 type Response struct {
-	Message string `json:"message"`
-	Status  int    `json:"status"`
-	Data    gin.H  `json:"data"`
+	Message string                 `json:"message"`
+	Status  int                    `json:"status"`
+	Data    map[string]interface{} `json:"data"`
 }
 
 var (
-	Rdb             *redis.Client
-	UserKey         string
-	ValidatorKeys   map[string]string
+	Rdb           *redis.Client
+	UserKey       string
+	ValidatorKeys map[string]string
 )
 
+// Function init is a special type function used to execute database initialization and the initialization of basic application models needed for the smooth runninng of the application
 func init() {
 
 	if err := godotenv.Load(); err != nil {
@@ -77,21 +78,21 @@ func init() {
 	}
 
 	ValidatorKeys = map[string]string{
-		"Tag"        : "validate",
-	    "Required"   : "required",
-	    "Omit"       : "omitempty",
-	    "FirstName"  : "firstname",
-	    "LastName"   : "lastname",
-	    "Email"      : "email",
-		"Mobile"     : "mobile",
-	    "Age"        : "age",
-	    "Role"       : "roleid",
-	    "Status"     : "status",
+		"Tag":       "validate",
+		"Required":  "required",
+		"Omit":      "omitempty",
+		"FirstName": "firstname",
+		"LastName":  "lastname",
+		"Email":     "email",
+		"Mobile":    "mobile",
+		"Age":       "age",
+		"Role":      "roleid",
+		"Status":    "status",
 	}
 
 }
 
-// function used to return a struct typed data into a map[string]interface{} data
+// Function ConvertStructToMap used to return a struct typed data into a map[string]interface{} data
 func ConvertStructToMap(data interface{}) (map[string]interface{}, error) {
 
 	v := reflect.ValueOf(data)
@@ -107,7 +108,7 @@ func ConvertStructToMap(data interface{}) (map[string]interface{}, error) {
 
 	mapData := make(map[string]interface{})
 
-	for i:=0;i<v.NumField();i++{
+	for i := 0; i < v.NumField(); i++ {
 
 		fieldValue := v.Field(i)
 
