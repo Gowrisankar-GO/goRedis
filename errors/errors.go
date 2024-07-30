@@ -1,3 +1,4 @@
+// Package errors contains basic errors where they are used in error handling in request handler functions
 package errors
 
 import "errors"

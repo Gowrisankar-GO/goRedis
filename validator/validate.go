@@ -1,15 +1,17 @@
+// Package validator provides a straight forward way to validate basic payloads passed to every request handler functions
 package validator
 
 import (
 	"fmt"
 	"errors"
-	errPkg "go_redis/errors"
-	"go_redis/models"
+	errPkg "redis_user_management/errors"
+	"redis_user_management/models"
 	"reflect"
 	"regexp"
 	"strings"
 )
 
+// 	Function ValidateStruct used to validate struct typed variables.It returns error if the struct doesnot meets the required validations, otherwise it retuns nil.
 func ValidateStruct(data interface{}) error {
 
 	v := reflect.ValueOf(data)
