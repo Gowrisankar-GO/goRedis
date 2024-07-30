@@ -2,6 +2,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"redis_user_management/api"
@@ -10,22 +11,24 @@ import (
 	_ "redis_user_management/docs" // To Import the generated docs
 
 	"github.com/gin-gonic/gin"
-	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func main() {
 
+	port := os.Getenv("APP_PORT")
+
 	appEngine := gin.Default()
 
-	url := ginSwagger.URL("http://localhost:9090/swagger/doc.json")
+	docPath := fmt.Sprintf("http://localhost:%v/swagger/doc.json",port)
+
+	url := ginSwagger.URL(docPath)
 
 	appEngine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	// Initialize API endpoints
 	Engine := api.AppEndpints(appEngine)
-
-	port := os.Getenv("APP_PORT")
 
 	if err := Engine.Run(":" + port); err != nil {
 
