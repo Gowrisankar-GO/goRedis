@@ -15,4 +15,4 @@
    * Clone our goRedis repository.
    * In Default,the env file uses 9090 port,For your favourites,change the port as you wish.
    * Start server by running command `go run main.go` in your local machine.
-   * For documentation purposes, visit `http://localhost:9090/swagger/index.tml` in you local machine.
+   * For documentation purposes, visit `http://localhost:9090/swagger/index.html` in you local machine.

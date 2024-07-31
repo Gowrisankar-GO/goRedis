@@ -4,8 +4,8 @@ package dbconfig
 import (
 	"context"
 	"fmt"
-	errPkg "redis_user_management/errors"
 	"os"
+	"redis_user_management/info"
 	"strconv"
 
 	"github.com/redis/go-redis/v9"
@@ -31,10 +31,10 @@ func DatabaseConnection(ctx context.Context) (*redis.Client, error) {
 	rdbCmd := rdb.Ping(ctx)
 
 	if rdbCmd.Val() != "PONG" {
-		return &redis.Client{}, errPkg.ErrDbConn
+		return &redis.Client{}, info.ErrDbConn
 	}
 
-	fmt.Println("cmd",rdbCmd)
+	fmt.Println("cmd", rdbCmd)
 
 	return rdb, nil
 

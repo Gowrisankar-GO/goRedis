@@ -5,7 +5,8 @@ import (
 	"context"
 	"log"
 	"redis_user_management/dbconfig"
-	errPkg "redis_user_management/errors"
+	"redis_user_management/info"
+	loggger "redis_user_management/logger"
 	"reflect"
 
 	"github.com/joho/godotenv"
@@ -46,7 +47,7 @@ func init() {
 
 	if err := godotenv.Load(); err != nil {
 
-		log.Fatalf("%v", errPkg.ErrLoadEnv)
+		log.Fatalf("%v", info.ErrLoadEnv)
 	}
 
 	var connErr error
@@ -55,7 +56,7 @@ func init() {
 
 	if connErr != nil {
 
-		log.Fatalf("%v", errPkg.ErrDbConn)
+		log.Fatalf("%v", info.ErrDbConn)
 	}
 
 	UserKey = "user:id"
@@ -64,7 +65,9 @@ func init() {
 
 	if err != nil {
 
-		log.Fatalf("Could not check if counter exists: %v", err)
+		loggger.ErrorLog().Printf("%v: %v",info.ErrUkeyexist,err)
+
+		log.Fatalf("%v: %v",info.ErrUkeyexist,err)
 	}
 
 	if exists == 0 {
@@ -73,7 +76,9 @@ func init() {
 
 		if err != nil {
 
-			log.Fatalf("Could not set initial counter value: %v", err)
+			loggger.ErrorLog().Printf("%v: %v",info.ErrSetInitUkey,err)
+
+			log.Fatalf("%v: %v", info.ErrSetInitUkey, err)
 		}
 	}
 
@@ -101,7 +106,7 @@ func ConvertStructToMap(data interface{}) (map[string]interface{}, error) {
 
 	if v.Kind() != reflect.Struct {
 
-		return map[string]interface{}{}, errPkg.ErrStructType
+		return map[string]interface{}{}, info.ErrStructType
 	}
 
 	t := reflect.TypeOf(data)

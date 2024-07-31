@@ -4,15 +4,17 @@ package controller
 import (
 	"context"
 	"encoding/json"
-	"redis_user_management/models"
-	"redis_user_management/validator"
 	"io"
 	"net/http"
+	"redis_user_management/info"
+	"redis_user_management/models"
+	"redis_user_management/validator"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 )
 
 // Function FetchUser used to fetch user details
@@ -25,7 +27,7 @@ import (
 // @Param   id  path  string  true  "User ID"
 // @Success 200 {object} models.Response
 // @Failure 400 {object} models.Response
-// @Failure 404 {object} models.Response
+// @Failure 500 {object} models.Response
 // @Router /user/{id} [get]
 func FetchUser(c *gin.Context) {
 
@@ -35,7 +37,9 @@ func FetchUser(c *gin.Context) {
 
 	if userId == "" {
 
-		resp = models.Response{Message: "userid is required", Status: 0, Data: gin.H{}}
+		InfoLog.Printf("%v",info.MsgReqUid)
+
+		resp = models.Response{Message: info.MsgReqUid, Status: 0, Data: gin.H{}}
 
 		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
 
@@ -52,14 +56,25 @@ func FetchUser(c *gin.Context) {
 
 	if err != nil {
 
-		resp = models.Response{Message: "unable to fetch user detail", Status: 0, Data: gin.H{}}
+		InfoLog.Printf("%v: %v",info.MsgFetchUser,userId)
+
+		resp = models.Response{Message: info.MsgFetchUser, Status: 0, Data: gin.H{}}
+
+		if err == redis.Nil{
+
+			c.AbortWithStatusJSON(http.StatusBadRequest, resp)
+
+			return
+		}
 
 		c.AbortWithStatusJSON(http.StatusInternalServerError, resp)
 
 		return
 	}
 
-	resp = models.Response{Message: "successfully fetched user detail", Status: 1, Data: gin.H{"userDetail": userDetail}}
+	InfoLog.Printf("%v: %v",info.MsgGetUser,userId)
+
+	resp = models.Response{Message: info.MsgGetUser, Status: 1, Data: gin.H{"userDetail": userDetail}}
 
 	c.JSON(http.StatusOK, resp)
 }
@@ -83,10 +98,12 @@ func CreateUser(c *gin.Context) {
 	bodyBytes, err := io.ReadAll(c.Request.Body)
 
 	if err != nil {
+		
+		InfoLog.Printf("%v",info.MsgReadBody)
 
-		resp = models.Response{Message: "unable to read request body", Status: 0, Data: gin.H{}}
+		resp = models.Response{Message: info.MsgReadBody, Status: 0, Data: gin.H{}}
 
-		c.AbortWithStatusJSON(http.StatusInternalServerError, resp)
+		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
 
 		return
 	}
@@ -97,16 +114,20 @@ func CreateUser(c *gin.Context) {
 
 	if err != nil {
 
-		resp = models.Response{Message: "unable to read user data", Status: 0, Data: gin.H{}}
+		InfoLog.Printf("%v",info.MsgReadJson)
+
+		resp = models.Response{Message: info.MsgReadJson, Status: 0, Data: gin.H{}}
 
 		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
 
 		return
 	}
 
-	if err := validator.ValidateStruct(userData);err!= nil{
+	if err := validator.ValidateStruct(userData); err != nil {
 
-		resp = models.Response{Message: "json field validation failed", Status: 0, Data: gin.H{}}
+		InfoLog.Printf("%v",info.MsgJsonValid)
+
+		resp = models.Response{Message: info.MsgJsonValid, Status: 0, Data: gin.H{}}
 
 		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
 
@@ -122,7 +143,9 @@ func CreateUser(c *gin.Context) {
 
 	if err != nil {
 
-		resp = models.Response{Message: "unable to create a new user", Status: 0, Data: gin.H{}}
+		ErrLog.Printf("%v",info.ErrCreateUser)
+
+		resp = models.Response{Message: info.MsgCreateUser, Status: 0, Data: gin.H{}}
 
 		c.AbortWithStatusJSON(http.StatusInternalServerError, resp)
 
@@ -141,14 +164,18 @@ func CreateUser(c *gin.Context) {
 
 	if err != nil {
 
-		resp = models.Response{Message: "unable to create a new user", Status: 0, Data: gin.H{}}
+		ErrLog.Printf("%v",info.ErrCreateUser)
+
+		resp = models.Response{Message: info.MsgCreateUser, Status: 0, Data: gin.H{}}
 
 		c.AbortWithStatusJSON(http.StatusInternalServerError, resp)
 
 		return
 	}
 
-	resp = models.Response{Message: "successfully created a new user", Status: 1, Data: gin.H{"userDetail": userData}}
+	InfoLog.Printf("%v: %v",info.MsgNewUser,userId)
+
+	resp = models.Response{Message: info.MsgNewUser, Status: 1, Data: gin.H{"userDetail": userData}}
 
 	c.JSON(200, resp)
 }
@@ -174,7 +201,9 @@ func UpdateUser(c *gin.Context) {
 
 	if err != nil {
 
-		resp = models.Response{Message: "unable to read request body", Status: 0, Data: gin.H{}}
+		InfoLog.Printf("%v",info.MsgReadBody)
+
+		resp = models.Response{Message: info.MsgReadBody, Status: 0, Data: gin.H{}}
 
 		c.AbortWithStatusJSON(http.StatusInternalServerError, resp)
 
@@ -187,16 +216,20 @@ func UpdateUser(c *gin.Context) {
 
 	if err != nil {
 
-		resp = models.Response{Message: "unable to read user data", Status: 0, Data: gin.H{}}
+		InfoLog.Printf("%v",info.MsgReadJson)
+
+		resp = models.Response{Message: info.MsgReadJson, Status: 0, Data: gin.H{}}
 
 		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
 
 		return
 	}
 
-	if err := validator.ValidateStruct(userData);err!= nil{
+	if err := validator.ValidateStruct(userData); err != nil {
 
-		resp = models.Response{Message: "json field validation failed", Status: 0, Data: gin.H{}}
+		InfoLog.Printf("%v",info.MsgJsonValid)
+
+		resp = models.Response{Message: info.MsgJsonValid, Status: 0, Data: gin.H{}}
 
 		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
 
@@ -216,14 +249,18 @@ func UpdateUser(c *gin.Context) {
 
 	if err != nil {
 
-		resp = models.Response{Message: "unable to update the user", Status: 0, Data: gin.H{}}
+		ErrLog.Printf("%v: %v",info.ErrUpdateUser,userId)
+
+		resp = models.Response{Message: info.MsgUpdateUser, Status: 0, Data: gin.H{}}
 
 		c.AbortWithStatusJSON(http.StatusInternalServerError, resp)
 
 		return
 	}
 
-	resp = models.Response{Message: "successfully updated the user", Status: 1, Data: gin.H{"userDetail": userData}}
+	InfoLog.Printf("%v: %v",info.MsgUpdatedUser,userId)
+
+	resp = models.Response{Message: info.MsgUpdatedUser, Status: 1, Data: gin.H{"userDetail": userData}}
 
 	c.JSON(http.StatusOK, resp)
 }
@@ -238,7 +275,7 @@ func UpdateUser(c *gin.Context) {
 // @Param   id  path  string  true  "User ID"
 // @Success 200 {object} models.Response
 // @Failure 400 {object} models.Response
-// @Failure 404 {object} models.Response
+// @Failure 500 {object} models.Response
 // @Router /user/delete/{id} [delete]
 func DeleteUser(c *gin.Context) {
 
@@ -248,7 +285,9 @@ func DeleteUser(c *gin.Context) {
 
 	if userId == "" {
 
-		resp = models.Response{Message: "userid is required", Status: 0, Data: gin.H{}}
+		InfoLog.Printf("%v",info.MsgReqUid)
+
+		resp = models.Response{Message: info.MsgReqUid, Status: 0, Data: gin.H{}}
 
 		c.AbortWithStatusJSON(http.StatusBadRequest, resp)
 
@@ -265,14 +304,18 @@ func DeleteUser(c *gin.Context) {
 
 	if err != nil {
 
-		resp = models.Response{Message: "unable to delete the user", Status: 0, Data: gin.H{}}
+		ErrLog.Printf("%V: %v",info.ErrDelUser,userId)
+
+		resp = models.Response{Message: info.MsgDelUser, Status: 0, Data: gin.H{}}
 
 		c.AbortWithStatusJSON(http.StatusInternalServerError, resp)
 
 		return
 	}
 
-	resp = models.Response{Message: "successfully deleted the user", Status: 1, Data: gin.H{"userId": userId}}
+	InfoLog.Printf("%v: %v",info.MsgDeleteUser,userId)
+
+	resp = models.Response{Message: info.MsgDelUser, Status: 1, Data: gin.H{"userId": userId}}
 
 	c.JSON(http.StatusOK, resp)
 }

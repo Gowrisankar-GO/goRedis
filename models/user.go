@@ -13,8 +13,6 @@ func (Defs BasicDefs) GetUserDetail(key string) (map[string]string, error) {
 
 	if err != nil {
 
-		fmt.Println("err", err)
-
 		return map[string]string{}, err
 	}
 
@@ -29,8 +27,6 @@ func (Defs BasicDefs) IncrementUserId() (int64, error) {
 	counter, err := Defs.DbConn.Incr(Defs.Ctx, UserKey).Result()
 
 	if err != nil {
-
-		fmt.Println("err", err)
 
 		return 0, err
 	}
@@ -47,14 +43,10 @@ func (Defs BasicDefs) SetUser(key string, user User) error {
 
 	if err != nil {
 
-		fmt.Println("err", err)
-
 		return err
 	}
 
 	if _, err := Defs.DbConn.HSet(Defs.Ctx, key, mapData).Result(); err != nil {
-
-		fmt.Println("err", err)
 
 		return err
 	}
@@ -102,8 +94,6 @@ func (Defs BasicDefs) DeleteUserTransaction(key string)error{
 	pipeline.Decr(Defs.Ctx,UserKey)
 
 	if _, err := pipeline.Exec(Defs.Ctx);err!= nil{
-
-		fmt.Println("err",err)
 
 		return err
 	}
