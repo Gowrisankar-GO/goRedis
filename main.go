@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 	"redis_user_management/api"
-	errPkg "redis_user_management/errors"
+	"redis_user_management/info"
 
 	_ "redis_user_management/docs" // To Import the generated docs
 
@@ -32,6 +32,6 @@ func main() {
 
 	if err := Engine.Run(":" + port); err != nil {
 
-		log.Fatalf("%v", errPkg.ErrRunServer)
+		log.Fatalf("%v", info.ErrRunServer)
 	}
 }

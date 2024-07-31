@@ -96,8 +96,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.Response"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.Response"
                         }
@@ -193,8 +193,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.Response"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.Response"
                         }

@@ -4,7 +4,7 @@ package validator
 import (
 	"fmt"
 	"errors"
-	errPkg "redis_user_management/errors"
+	"redis_user_management/info"
 	"redis_user_management/models"
 	"reflect"
 	"regexp"
@@ -19,7 +19,7 @@ func ValidateStruct(data interface{}) error {
 	// confirming whether the provided data is a struct type or not
 	if v.Kind() != reflect.Struct {
 
-		return errPkg.ErrStructType
+		return info.ErrStructType
 	}
 
 	t := reflect.TypeOf(data)
@@ -46,7 +46,7 @@ func ValidateStruct(data interface{}) error {
 
 				if emptyData == "" || emptyData == "0" || emptyData == "nil" {
 
-					err := fmt.Sprintf("Field:%v, Required:%v",FieldName,errPkg.ErrReqFld)
+					err := fmt.Sprintf("Field:%v, Required:%v",FieldName,info.ErrReqFld)
 
 					return errors.New(err)
 				}
@@ -63,7 +63,7 @@ func ValidateStruct(data interface{}) error {
 
 				if !regex.MatchString(fieldValue.Interface().(string)){
 
-					err := fmt.Sprintf("Field:%v, FirstName:%v",FieldName,errPkg.ErrFldVal)
+					err := fmt.Sprintf("Field:%v, FirstName:%v",FieldName,info.ErrFldVal)
 
 					return errors.New(err)
 				}
@@ -76,7 +76,7 @@ func ValidateStruct(data interface{}) error {
 
 				if !regex.MatchString(fieldValue.String()){
 
-					err := fmt.Sprintf("Field:%v, LastName:%v",FieldName,errPkg.ErrFldVal)
+					err := fmt.Sprintf("Field:%v, LastName:%v",FieldName,info.ErrFldVal)
 
 					return errors.New(err)
 				}
@@ -89,7 +89,7 @@ func ValidateStruct(data interface{}) error {
 
 				if !regex.MatchString(fieldValue.String()){
 
-					err := fmt.Sprintf("Field:%v, Email:%v",FieldName,errPkg.ErrFldVal)
+					err := fmt.Sprintf("Field:%v, Email:%v",FieldName,info.ErrFldVal)
 
 					return errors.New(err)
 				}
@@ -102,7 +102,7 @@ func ValidateStruct(data interface{}) error {
 
 				if !regex.MatchString(fieldValue.String()){
 
-					err := fmt.Sprintf("Field:%v, Email:%v",FieldName,errPkg.ErrFldVal)
+					err := fmt.Sprintf("Field:%v, Email:%v",FieldName,info.ErrFldVal)
 
 					return errors.New(err)
 				}
@@ -111,7 +111,7 @@ func ValidateStruct(data interface{}) error {
 
 				if fieldValue.Interface().(uint)<1 || fieldValue.Interface().(uint)>130{
 
-					err := fmt.Sprintf("Field:%v, Age:%v",FieldName,errPkg.ErrFldVal)
+					err := fmt.Sprintf("Field:%v, Age:%v",FieldName,info.ErrFldVal)
 
 					return errors.New(err)
 				} 
@@ -120,7 +120,7 @@ func ValidateStruct(data interface{}) error {
 
 				if fieldValue.Interface().(uint)<1{
 
-					err := fmt.Sprintf("Field:%v, Role:%v",FieldName,errPkg.ErrFldVal)
+					err := fmt.Sprintf("Field:%v, Role:%v",FieldName,info.ErrFldVal)
 
 					return errors.New(err)
 				} 
@@ -129,14 +129,14 @@ func ValidateStruct(data interface{}) error {
 
 				if fieldValue.Interface().(uint)!=0 && fieldValue.Interface().(uint)!=1{
 
-					err := fmt.Sprintf("Field:%v, Status:%v",FieldName,errPkg.ErrFldVal)
+					err := fmt.Sprintf("Field:%v, Status:%v",FieldName,info.ErrFldVal)
 
 					return errors.New(err)
 				} 
 
 			default:
 
-				fmt.Println("no error spotted")
+				fmt.Printf("the field: %v  has validation errors",FieldName)
 
 			}
 
